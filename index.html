@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Santa x Dolce & Gabbana Comment Generator</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --text: #000000;
+  --border: #000000;
+  --hover: #f5f5f5;
+  --accent: #333333;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.container {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+}
+h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--accent);
+  margin-bottom: 2rem;
+}
+.counter {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+button {
+  background: var(--text);
+  color: var(--bg);
+  border: 2px solid var(--border);
+  padding: 14px 32px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  width: 100%;
+  max-width: 320px;
+}
+button:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+button:active {
+  transform: scale(0.98);
+}
+.hint {
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+.comment-preview {
+  margin-top: 2rem;
+  padding: 16px;
+  border: 1px solid #ddd;
+  min-height: 60px;
+  font-size: 0.95rem;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+@media (max-width: 480px) {
+  h1 { font-size: 1.5rem; }
+  button { padding: 12px 24px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Santa x Dolce & Gabbana<br>Comment Generator</h1>
+  <p class="subtitle">Generate unique comments for the collaboration post</p>
+  <div class="counter" id="counter">Copied: 0 comments</div>
+  <button id="generateBtn">Generate and Copy</button>
+  <p class="hint">Press Space to generate and copy</p>
+  <div class="comment-preview" id="preview">Your generated comment will appear here</div>
+</div>
+<script>
+const STORAGE_KEY = 'santa_dg_comments_used';
+const COUNT_KEY = 'santa_dg_count';
+
+// Safe storage that falls back to memory if localStorage is blocked (e.g. sandboxed iframe)
+const memoryStore = {};
+function safeGetItem(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    return memoryStore[key] || null;
+  }
+}
+function safeSetItem(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    memoryStore[key] = value;
+  }
+}
+
+let usedComments = new Set(JSON.parse(safeGetItem(STORAGE_KEY) || '[]'));
+let count = parseInt(safeGetItem(COUNT_KEY) || '0', 10);
+
+const counterEl = document.getElementById('counter');
+const previewEl = document.getElementById('preview');
+const btn = document.getElementById('generateBtn');
+
+function updateCounter() {
+  counterEl.textContent = `Copied: ${count} comments`;
+}
+updateCounter();
+
+// Large pool of comment templates across languages (no Vietnamese, no hashtags, no emojis)
+// Combinatorial generation for high uniqueness
+
+const languages = [
+  'en', 'es', 'fr', 'it', 'de', 'pt', 'ja', 'ko', 'zh', 'th', 'id', 'ru', 'ar', 'nl', 'sv', 'pl', 'tr'
+];
+
+const templates = {
+  en: [
+    "Santa looks absolutely stunning in this Dolce and Gabbana look.",
+    "The collaboration between Santa and Dolce and Gabbana is pure perfection.",
+    "Santa wears Dolce and Gabbana so elegantly. This is next level fashion.",
+    "Dolce and Gabbana suits Santa perfectly. He looks incredible.",
+    "I am so excited for more Santa and Dolce and Gabbana moments.",
+    "Santa brings such elegance to Dolce and Gabbana. Beautiful.",
+    "This Santa and Dolce and Gabbana pairing is everything I hoped for.",
+    "Santa in Dolce and Gabbana is a dream come true.",
+    "The way Santa carries this Dolce and Gabbana outfit is flawless.",
+    "Dolce and Gabbana understood Santa so well. Gorgeous.",
+    "Santa and Dolce and Gabbana together create magic.",
+    "I cannot stop looking at Santa in this Dolce and Gabbana suit.",
+    "Santa elevates every Dolce and Gabbana piece he wears.",
+    "Perfect match between Santa and Dolce and Gabbana.",
+    "Santa looks like he was made for Dolce and Gabbana.",
+    "This is the collaboration I have been waiting for. Santa and Dolce and Gabbana.",
+    "Santa in Dolce and Gabbana is simply breathtaking.",
+    "Dolce and Gabbana looks even better on Santa.",
+    "Santa and Dolce and Gabbana are a match made in fashion heaven.",
+    "More of Santa in Dolce and Gabbana please."
+  ],
+  es: [
+    "Santa se ve absolutamente impresionante en este look de Dolce and Gabbana.",
+    "La colaboracion entre Santa y Dolce and Gabbana es pura perfeccion.",
+    "Santa lleva Dolce and Gabbana con tanta elegancia. Esto es moda de otro nivel.",
+    "Dolce and Gabbana le queda perfecto a Santa. Se ve increible.",
+    "Estoy muy emocionado por mas momentos de Santa y Dolce and Gabbana.",
+    "Santa aporta tanta elegancia a Dolce and Gabbana. Hermoso.",
+    "Esta combinacion de Santa y Dolce and Gabbana es todo lo que esperaba.",
+    "Santa en Dolce and Gabbana es un sueno hecho realidad.",
+    "La forma en que Santa lleva este atuendo de Dolce and Gabbana es impecable.",
+    "Dolce and Gabbana entendio a Santa perfectamente. Precioso.",
+    "Santa y Dolce and Gabbana juntos crean magia.",
+    "No puedo dejar de mirar a Santa en este traje de Dolce and Gabbana.",
+    "Santa eleva cada pieza de Dolce and Gabbana que usa.",
+    "Combinacion perfecta entre Santa y Dolce and Gabbana.",
+    "Santa parece hecho para Dolce and Gabbana.",
+    "Esta es la colaboracion que estaba esperando. Santa y Dolce and Gabbana.",
+    "Santa en Dolce and Gabbana es simplemente impresionante.",
+    "Dolce and Gabbana se ve aun mejor en Santa.",
+    "Santa y Dolce and Gabbana son una combinacion perfecta en el mundo de la moda.",
+    "Mas de Santa en Dolce and Gabbana por favor."
+  ],
+  fr: [
+    "Santa est absolument magnifique dans ce look Dolce and Gabbana.",
+    "La collaboration entre Santa et Dolce and Gabbana est pure perfection.",
+    "Santa porte Dolce and Gabbana avec une telle elegance. C'est de la mode de haut niveau.",
+    "Dolce and Gabbana va parfaitement a Santa. Il est incroyable.",
+    "Je suis tellement impatient pour plus de moments Santa et Dolce and Gabbana.",
+    "Santa apporte tant d'elegance a Dolce and Gabbana. Magnifique.",
+    "Cet appariement Santa et Dolce and Gabbana est tout ce que j'esperais.",
+    "Santa en Dolce and Gabbana est un reve devenu realite.",
+    "La facon dont Santa porte cette tenue Dolce and Gabbana est impeccable.",
+    "Dolce and Gabbana a parfaitement compris Santa. Superbe.",
+    "Santa et Dolce and Gabbana ensemble creent de la magie.",
+    "Je ne peux pas arreter de regarder Santa dans ce costume Dolce and Gabbana.",
+    "Santa sublime chaque piece Dolce and Gabbana qu'il porte.",
+    "Association parfaite entre Santa et Dolce and Gabbana.",
+    "Santa semble fait pour Dolce and Gabbana.",
+    "C'est la collaboration que j'attendais. Santa et Dolce and Gabbana.",
+    "Santa en Dolce and Gabbana est tout simplement epoustouflant.",
+    "Dolce and Gabbana est encore plus beau sur Santa.",
+    "Santa et Dolce and Gabbana sont un match parfait dans le monde de la mode.",
+    "Plus de Santa en Dolce and Gabbana s'il vous plait."
+  ],
+  it: [
+    "Santa e assolutamente stupendo in questo look Dolce and Gabbana.",
+    "La collaborazione tra Santa e Dolce and Gabbana e pura perfezione.",
+    "Santa indossa Dolce and Gabbana con tanta eleganza. Questo e moda di alto livello.",
+    "Dolce and Gabbana sta perfettamente a Santa. E incredibile.",
+    "Sono cosi emozionato per altri momenti Santa e Dolce and Gabbana.",
+    "Santa porta tanta eleganza a Dolce and Gabbana. Bellissimo.",
+    "Questa coppia Santa e Dolce and Gabbana e tutto cio che speravo.",
+    "Santa in Dolce and Gabbana e un sogno diventato realta.",
+    "Il modo in cui Santa indossa questo outfit Dolce and Gabbana e impeccabile.",
+    "Dolce and Gabbana ha capito Santa perfettamente. Meraviglioso.",
+    "Santa e Dolce and Gabbana insieme creano magia.",
+    "Non riesco a smettere di guardare Santa in questo completo Dolce and Gabbana.",
+    "Santa eleva ogni pezzo Dolce and Gabbana che indossa.",
+    "Abbinamento perfetto tra Santa e Dolce and Gabbana.",
+    "Santa sembra fatto per Dolce and Gabbana.",
+    "Questa e la collaborazione che aspettavo. Santa e Dolce and Gabbana.",
+    "Santa in Dolce and Gabbana e semplicemente mozzafiato.",
+    "Dolce and Gabbana sta ancora meglio su Santa.",
+    "Santa e Dolce and Gabbana sono una combinazione perfetta nel mondo della moda.",
+    "Piu Santa in Dolce and Gabbana per favore."
+  ],
+  de: [
+    "Santa sieht absolut atemberaubend in diesem Dolce and Gabbana Look aus.",
+    "Die Zusammenarbeit zwischen Santa und Dolce and Gabbana ist pure Perfektion.",
+    "Santa traegt Dolce and Gabbana so elegant. Das ist Mode auf hoechstem Niveau.",
+    "Dolce and Gabbana steht Santa perfekt. Er sieht unglaublich aus.",
+    "Ich freue mich so auf mehr Santa und Dolce and Gabbana Momente.",
+    "Santa bringt so viel Eleganz zu Dolce and Gabbana. Wunderschoen.",
+    "Diese Paarung von Santa und Dolce and Gabbana ist alles was ich mir erhofft habe.",
+    "Santa in Dolce and Gabbana ist ein Traum geworden.",
+    "Die Art wie Santa dieses Dolce and Gabbana Outfit traegt ist makellos.",
+    "Dolce and Gabbana hat Santa perfekt verstanden. Wunderschoen.",
+    "Santa und Dolce and Gabbana zusammen erschaffen Magie.",
+    "Ich kann nicht aufhoeren Santa in diesem Dolce and Gabbana Anzug anzusehen.",
+    "Santa hebt jedes Dolce and Gabbana Stueck das er traegt.",
+    "Perfektes Match zwischen Santa und Dolce and Gabbana.",
+    "Santa sieht aus als waere er fuer Dolce and Gabbana gemacht.",
+    "Das ist die Zusammenarbeit auf die ich gewartet habe. Santa und Dolce and Gabbana.",
+    "Santa in Dolce and Gabbana ist einfach atemberaubend.",
+    "Dolce and Gabbana sieht auf Santa noch besser aus.",
+    "Santa und Dolce and Gabbana sind ein perfektes Match in der Modewelt.",
+    "Mehr Santa in Dolce and Gabbana bitte."
+  ],
+  pt: [
+    "Santa fica absolutamente deslumbrante neste look da Dolce and Gabbana.",
+    "A colaboracao entre Santa e Dolce and Gabbana e pura perfeicao.",
+    "Santa usa Dolce and Gabbana com tanta elegancia. Isso e moda de outro nivel.",
+    "Dolce and Gabbana combina perfeitamente com Santa. Ele esta incrivel.",
+    "Estou tao animado para mais momentos de Santa e Dolce and Gabbana.",
+    "Santa traz tanta elegancia a Dolce and Gabbana. Lindo.",
+    "Essa combinacao de Santa e Dolce and Gabbana e tudo o que eu esperava.",
+    "Santa na Dolce and Gabbana e um sonho realizado.",
+    "A maneira como Santa veste essa roupa da Dolce and Gabbana e impecavel.",
+    "Dolce and Gabbana entendeu Santa perfeitamente. Maravilhoso.",
+    "Santa e Dolce and Gabbana juntos criam magia.",
+    "Nao consigo parar de olhar para Santa neste terno da Dolce and Gabbana.",
+    "Santa eleva cada peca da Dolce and Gabbana que ele usa.",
+    "Combinacao perfeita entre Santa e Dolce and Gabbana.",
+    "Santa parece feito para a Dolce and Gabbana.",
+    "Essa e a colaboracao que eu estava esperando. Santa e Dolce and Gabbana.",
+    "Santa na Dolce and Gabbana e simplesmente de tirar o folego.",
+    "Dolce and Gabbana fica ainda melhor em Santa.",
+    "Santa e Dolce and Gabbana sao uma combinacao perfeita no mundo da moda.",
+    "Mais Santa na Dolce and Gabbana por favor."
+  ],
+  ja: [
+    "SantaはこのDolce and Gabbanaのルックで本当に素晴らしい。",
+    "SantaとDolce and Gabbanaのコラボレーションは完璧です。",
+    "SantaはDolce and Gabbanaをとてもエレガントに着こなしています。最高のファッションです。",
+    "Dolce and GabbanaはSantaにぴったりです。彼は素晴らしい。",
+    "もっとSantaとDolce and Gabbanaの瞬間が見たいです。",
+    "SantaはDolce and Gabbanaに優雅さを加えています。美しい。",
+    "このSantaとDolce and Gabbanaの組み合わせは期待以上です。",
+    "SantaのDolce and Gabbanaは夢のようです。",
+    "SantaがこのDolce and Gabbanaの衣装を着こなす姿は完璧です。",
+    "Dolce and GabbanaはSantaを完璧に理解しています。素晴らしい。",
+    "SantaとDolce and Gabbanaは一緒に魔法を生み出します。",
+    "SantaのこのDolce and Gabbanaのスーツから目が離せません。",
+    "SantaはDolce and Gabbanaのすべてのピースを格上げします。",
+    "SantaとDolce and Gabbanaの完璧なマッチです。",
+    "SantaはDolce and Gabbanaのために作られたようです。",
+    "これが私が待っていたコラボレーションです。SantaとDolce and Gabbana。",
+    "SantaのDolce and Gabbanaは息をのむほど美しい。",
+    "Dolce and GabbanaはSantaの上でさらに美しく見えます。",
+    "SantaとDolce and Gabbanaはファッションの世界で完璧なマッチです。",
+    "もっとSantaのDolce and Gabbanaを見たいです。"
+  ],
+  ko: [
+    "Santa는 이 Dolce and Gabbana 룩에서 정말 멋있습니다.",
+    "Santa와 Dolce and Gabbana의 콜라보레이션은 완벽합니다.",
+    "Santa는 Dolce and Gabbana를 매우 우아하게 입습니다. 최고 수준의 패션입니다.",
+    "Dolce and Gabbana는 Santa에게 완벽하게 어울립니다. 그는 놀랍습니다.",
+    "더 많은 Santa와 Dolce and Gabbana 순간을 기대합니다.",
+    "Santa는 Dolce and Gabbana에 우아함을 더합니다. 아름답습니다.",
+    "이 Santa와 Dolce and Gabbana 조합은 내가 기대했던 모든 것입니다.",
+    "Santa의 Dolce and Gabbana는 꿈이 현실로 이루어진 것 같습니다.",
+    "Santa가 이 Dolce and Gabbana 의상을 입는 방식은 완벽합니다.",
+    "Dolce and Gabbana는 Santa를 완벽하게 이해했습니다. 아름다워요.",
+    "Santa와 Dolce and Gabbana는 함께 마법을 만듭니다.",
+    "Santa의 이 Dolce and Gabbana 수트에서 눈을 뗄 수 없습니다.",
+    "Santa는 그가 입는 모든 Dolce and Gabbana 피스를 향상시킵니다.",
+    "Santa와 Dolce and Gabbana의 완벽한 매치입니다.",
+    "Santa는 Dolce and Gabbana를 위해 만들어진 것 같습니다.",
+    "이것이 내가 기다려온 콜라보레이션입니다. Santa와 Dolce and Gabbana.",
+    "Santa의 Dolce and Gabbana는 정말 숨막히게 아름답습니다.",
+    "Dolce and Gabbana는 Santa에게 더 잘 어울립니다.",
+    "Santa와 Dolce and Gabbana는 패션 세계에서 완벽한 매치입니다.",
+    "더 많은 Santa의 Dolce and Gabbana를 보고 싶습니다."
+  ],
+  zh: [
+    "Santa在这套Dolce and Gabbana造型中看起来绝对惊艳。",
+    "Santa与Dolce and Gabbana的合作是纯粹的完美。",
+    "Santa把Dolce and Gabbana穿得如此优雅。这是顶级时尚。",
+    "Dolce and Gabbana非常适合Santa。他看起来不可思议。",
+    "我非常期待更多Santa和Dolce and Gabbana的时刻。",
+    "Santa为Dolce and Gabbana带来了如此多的优雅。美丽。",
+    "这个Santa和Dolce and Gabbana的搭配是我一直期待的。",
+    "Santa穿Dolce and Gabbana是梦想成真。",
+    "Santa穿这套Dolce and Gabbana服装的方式是完美的。",
+    "Dolce and Gabbana完全理解了Santa。太美了。",
+    "Santa和Dolce and Gabbana一起创造了魔法。",
+    "我无法停止看Santa穿这套Dolce and Gabbana西装。",
+    "Santa提升了他穿着的每一件Dolce and Gabbana单品。",
+    "Santa和Dolce and Gabbana是完美的搭配。",
+    "Santa看起来就是为Dolce and Gabbana而生的。",
+    "这是我一直在等待的合作。Santa和Dolce and Gabbana。",
+    "Santa穿Dolce and Gabbana简直令人叹为观止。",
+    "Dolce and Gabbana在Santa身上看起来更好。",
+    "Santa和Dolce and Gabbana在时尚界是完美的匹配。",
+    "请多来一些Santa穿Dolce and Gabbana的造型。"
+  ],
+  th: [
+    "Santa ดูดีมากในลุค Dolce and Gabbana นี้",
+    "การร่วมมือระหว่าง Santa กับ Dolce and Gabbana คือความสมบูรณ์แบบ",
+    "Santa สวมใส่ Dolce and Gabbana ได้อย่างสง่างาม นี่คือแฟชั่นระดับสูง",
+    "Dolce and Gabbana เหมาะกับ Santa มาก เขาดูน่าทึ่ง",
+    "ฉันตื่นเต้นมากสำหรับโมเมนต์ Santa กับ Dolce and Gabbana เพิ่มเติม",
+    "Santa นำความสง่างามมาสู่ Dolce and Gabbana สวยงาม",
+    "การจับคู่ Santa กับ Dolce and Gabbana นี้คือทุกอย่างที่ฉันหวัง",
+    "Santa ใน Dolce and Gabbana คือความฝันที่เป็นจริง",
+    "วิธีที่ Santa สวมชุด Dolce and Gabbana นี้สมบูรณ์แบบ",
+    "Dolce and Gabbana เข้าใจ Santa ได้อย่างสมบูรณ์แบบ สวยงาม",
+    "Santa กับ Dolce and Gabbana ร่วมกันสร้างเวทมนตร์",
+    "ฉันหยุดมอง Santa ในชุด Dolce and Gabbana นี้ไม่ได้",
+    "Santa ยกระดับทุกชิ้นของ Dolce and Gabbana ที่เขาสวม",
+    "การจับคู่ที่สมบูรณ์แบบระหว่าง Santa กับ Dolce and Gabbana",
+    "Santa ดูเหมือนถูกสร้างมาเพื่อ Dolce and Gabbana",
+    "นี่คือการร่วมมือที่ฉันรอคอย Santa กับ Dolce and Gabbana",
+    "Santa ใน Dolce and Gabbana งดงามจนหายใจไม่ออก",
+    "Dolce and Gabbana ดูดีขึ้นบน Santa",
+    "Santa กับ Dolce and Gabbana คือการจับคู่ที่สมบูรณ์แบบในโลกแฟชั่น",
+    "อยากเห็น Santa ใน Dolce and Gabbana มากขึ้น"
+  ],
+  id: [
+    "Santa terlihat sangat menakjubkan dalam look Dolce and Gabbana ini.",
+    "Kolaborasi antara Santa dan Dolce and Gabbana adalah kesempurnaan murni.",
+    "Santa memakai Dolce and Gabbana dengan sangat elegan. Ini fashion level tinggi.",
+    "Dolce and Gabbana sangat cocok untuk Santa. Dia terlihat luar biasa.",
+    "Saya sangat antusias untuk lebih banyak momen Santa dan Dolce and Gabbana.",
+    "Santa membawa begitu banyak keanggunan ke Dolce and Gabbana. Indah.",
+    "Pasangan Santa dan Dolce and Gabbana ini adalah semua yang saya harapkan.",
+    "Santa di Dolce and Gabbana adalah mimpi yang menjadi kenyataan.",
+    "Cara Santa mengenakan outfit Dolce and Gabbana ini sempurna.",
+    "Dolce and Gabbana memahami Santa dengan sempurna. Indah sekali.",
+    "Santa dan Dolce and Gabbana bersama menciptakan keajaiban.",
+    "Saya tidak bisa berhenti melihat Santa dalam setelan Dolce and Gabbana ini.",
+    "Santa meningkatkan setiap potongan Dolce and Gabbana yang dia kenakan.",
+    "Paduan sempurna antara Santa dan Dolce and Gabbana.",
+    "Santa terlihat seperti dibuat untuk Dolce and Gabbana.",
+    "Ini adalah kolaborasi yang saya tunggu. Santa dan Dolce and Gabbana.",
+    "Santa di Dolce and Gabbana sungguh menakjubkan.",
+    "Dolce and Gabbana terlihat lebih baik pada Santa.",
+    "Santa dan Dolce and Gabbana adalah paduan sempurna di dunia fashion.",
+    "Lebih banyak Santa di Dolce and Gabbana tolong."
+  ],
+  ru: [
+    "Santa выглядит абсолютно потрясающе в этом образе Dolce and Gabbana.",
+    "Сотрудничество между Santa и Dolce and Gabbana - это чистое совершенство.",
+    "Santa носит Dolce and Gabbana так элегантно. Это мода высокого уровня.",
+    "Dolce and Gabbana идеально подходит Santa. Он выглядит невероятно.",
+    "Я так рад большему количеству моментов Santa и Dolce and Gabbana.",
+    "Santa привносит столько элегантности в Dolce and Gabbana. Прекрасно.",
+    "Эта пара Santa и Dolce and Gabbana - все на что я надеялся.",
+    "Santa в Dolce and Gabbana - это мечта ставшая реальностью.",
+    "То как Santa носит этот наряд Dolce and Gabbana безупречно.",
+    "Dolce and Gabbana идеально понял Santa. Великолепно.",
+    "Santa и Dolce and Gabbana вместе создают магию.",
+    "Я не могу перестать смотреть на Santa в этом костюме Dolce and Gabbana.",
+    "Santa возвышает каждую вещь Dolce and Gabbana которую он носит.",
+    "Идеальное сочетание Santa и Dolce and Gabbana.",
+    "Santa выглядит так будто создан для Dolce and Gabbana.",
+    "Это сотрудничество которого я ждал. Santa и Dolce and Gabbana.",
+    "Santa в Dolce and Gabbana просто захватывает дух.",
+    "Dolce and Gabbana выглядит еще лучше на Santa.",
+    "Santa и Dolce and Gabbana - идеальное сочетание в мире моды.",
+    "Больше Santa в Dolce and Gabbana пожалуйста."
+  ],
+  ar: [
+    "Santa يبدو مذهلا تماما في هذا الاطلالة من Dolce and Gabbana.",
+    "التعاون بين Santa و Dolce and Gabbana هو الكمال المطلق.",
+    "Santa يرتدي Dolce and Gabbana باناقة كبيرة. هذا موضة من مستوى عال.",
+    "Dolce and Gabbana يناسب Santa بشكل مثالي. انه يبدو رائعا.",
+    "انا متحمس جدا لمزيد من لحظات Santa و Dolce and Gabbana.",
+    "Santa يجلب الكثير من الاناقة الى Dolce and Gabbana. جميل.",
+    "هذا الاقتران بين Santa و Dolce and Gabbana هو كل ما كنت اتمنى.",
+    "Santa في Dolce and Gabbana هو حلم تحقق.",
+    "الطريقة التي يرتدي بها Santa هذا الزي من Dolce and Gabbana مثالية.",
+    "Dolce and Gabbana فهم Santa بشكل مثالي. رائع.",
+    "Santa و Dolce and Gabbana معا يخلقان السحر.",
+    "لا استطيع التوقف عن النظر الى Santa في هذا البدلة من Dolce and Gabbana.",
+    "Santa يرفع كل قطعة من Dolce and Gabbana يرتديها.",
+    "تطابق مثالي بين Santa و Dolce and Gabbana.",
+    "Santa يبدو وكانه صنع من اجل Dolce and Gabbana.",
+    "هذا هو التعاون الذي كنت انتظره. Santa و Dolce and Gabbana.",
+    "Santa في Dolce and Gabbana ببساطة يخطف الانفاس.",
+    "Dolce and Gabbana يبدو افضل على Santa.",
+    "Santa و Dolce and Gabbana هما تطابق مثالي في عالم الموضة.",
+    "المزيد من Santa في Dolce and Gabbana من فضلك."
+  ],
+  nl: [
+    "Santa ziet er absoluut verbluffend uit in deze Dolce and Gabbana look.",
+    "De samenwerking tussen Santa en Dolce and Gabbana is pure perfectie.",
+    "Santa draagt Dolce and Gabbana zo elegant. Dit is mode op hoog niveau.",
+    "Dolce and Gabbana staat Santa perfect. Hij ziet er ongelooflijk uit.",
+    "Ik kijk zo uit naar meer Santa en Dolce and Gabbana momenten.",
+    "Santa brengt zoveel elegantie naar Dolce and Gabbana. Prachtig.",
+    "Deze combinatie van Santa en Dolce and Gabbana is alles wat ik hoopte.",
+    "Santa in Dolce and Gabbana is een droom die uitkomt.",
+    "De manier waarop Santa dit Dolce and Gabbana outfit draagt is vlekkeloos.",
+    "Dolce and Gabbana heeft Santa perfect begrepen. Prachtig.",
+    "Santa en Dolce and Gabbana samen creeren magie.",
+    "Ik kan niet stoppen met kijken naar Santa in dit Dolce and Gabbana pak.",
+    "Santa verheft elk Dolce and Gabbana stuk dat hij draagt.",
+    "Perfecte match tussen Santa en Dolce and Gabbana.",
+    "Santa lijkt gemaakt voor Dolce and Gabbana.",
+    "Dit is de samenwerking waar ik op wachtte. Santa en Dolce and Gabbana.",
+    "Santa in Dolce and Gabbana is gewoon adembenemend.",
+    "Dolce and Gabbana ziet er nog beter uit op Santa.",
+    "Santa en Dolce and Gabbana zijn een perfecte match in de modewereld.",
+    "Meer Santa in Dolce and Gabbana alsjeblieft."
+  ],
+  sv: [
+    "Santa ser absolut fantastisk ut i denna Dolce and Gabbana look.",
+    "Samarbetet mellan Santa och Dolce and Gabbana ar ren perfektion.",
+    "Santa bar Dolce and Gabbana sa elegant. Detta ar mode pa hog niva.",
+    "Dolce and Gabbana passar Santa perfekt. Han ser otrolig ut.",
+    "Jag ser sa fram emot fler Santa och Dolce and Gabbana stunder.",
+    "Santa ger sa mycket elegans till Dolce and Gabbana. Vackert.",
+    "Denna kombination av Santa och Dolce and Gabbana ar allt jag hoppades pa.",
+    "Santa i Dolce and Gabbana ar en drom som blivit verklighet.",
+    "Sattet Santa bar denna Dolce and Gabbana outfit ar felfritt.",
+    "Dolce and Gabbana forstod Santa perfekt. Underbart.",
+    "Santa och Dolce and Gabbana tillsammans skapar magi.",
+    "Jag kan inte sluta titta pa Santa i denna Dolce and Gabbana kostym.",
+    "Santa lyfter varje Dolce and Gabbana plagg han bar.",
+    "Perfekt match mellan Santa och Dolce and Gabbana.",
+    "Santa ser ut som om han ar gjord for Dolce and Gabbana.",
+    "Detta ar samarbetet jag vanta pa. Santa och Dolce and Gabbana.",
+    "Santa i Dolce and Gabbana ar helt enkelt andlost.",
+    "Dolce and Gabbana ser annu battre ut pa Santa.",
+    "Santa och Dolce and Gabbana ar en perfekt match i modevarlden.",
+    "Mer Santa i Dolce and Gabbana tack."
+  ],
+  pl: [
+    "Santa wyglada absolutnie oszalamiajaco w tym looku Dolce and Gabbana.",
+    "Wspolpraca miedzy Santa a Dolce and Gabbana to czysta perfekcja.",
+    "Santa nosi Dolce and Gabbana tak elegancko. To moda na wysokim poziomie.",
+    "Dolce and Gabbana idealnie pasuje do Santa. Wyglada niesamowicie.",
+    "Jestem tak podekscytowany wieksza liczba chwil Santa i Dolce and Gabbana.",
+    "Santa wnosi tyle elegancji do Dolce and Gabbana. Piekne.",
+    "To polaczenie Santa i Dolce and Gabbana to wszystko na co mialem nadzieje.",
+    "Santa w Dolce and Gabbana to marzenie ktore sie spelnilo.",
+    "Sposob w jaki Santa nosi ten stroj Dolce and Gabbana jest bezbledny.",
+    "Dolce and Gabbana doskonale zrozumial Santa. Wspaniale.",
+    "Santa i Dolce and Gabbana razem tworza magie.",
+    "Nie moge przestac patrzec na Santa w tym garniturze Dolce and Gabbana.",
+    "Santa podnosi kazdy element Dolce and Gabbana ktory nosi.",
+    "Idealne dopasowanie miedzy Santa a Dolce and Gabbana.",
+    "Santa wyglada jakby byl stworzony dla Dolce and Gabbana.",
+    "To jest wspolpraca na ktora czekalem. Santa i Dolce and Gabbana.",
+    "Santa w Dolce and Gabbana jest po prostu zapierajacy dech w piersiach.",
+    "Dolce and Gabbana wyglada jeszcze lepiej na Santa.",
+    "Santa i Dolce and Gabbana to idealne dopasowanie w swiecie mody.",
+    "Wiecej Santa w Dolce and Gabbana prosze."
+  ],
+  tr: [
+    "Santa bu Dolce and Gabbana lookunda kesinlikle nefes kesici gorunuyor.",
+    "Santa ve Dolce and Gabbana arasindaki isbirligi saf mukemmellik.",
+    "Santa Dolce and Gabbana yi cok zarif giyiyor. Bu ust duzey moda.",
+    "Dolce and Gabbana Santa ya mukemmel uyuyor. Inanilmaz gorunuyor.",
+    "Daha fazla Santa ve Dolce and Gabbana anlari icin cok heyecanliyim.",
+    "Santa Dolce and Gabbana ya cok zarafet katıyor. Guzel.",
+    "Bu Santa ve Dolce and Gabbana eslesmesi umdugum her sey.",
+    "Santa nin Dolce and Gabbana si gerceklesen bir ruya.",
+    "Santa nin bu Dolce and Gabbana kiyafetini giyis sekli kusursuz.",
+    "Dolce and Gabbana Santa yi mukemmel anladi. Harika.",
+    "Santa ve Dolce and Gabbana birlikte sihir yaratiyor.",
+    "Bu Dolce and Gabbana takimidaki Santa ya bakmayi birakamiyorum.",
+    "Santa giydigi her Dolce and Gabbana parcasini yukseltiyor.",
+    "Santa ve Dolce and Gabbana arasinda mukemmel uyum.",
+    "Santa Dolce and Gabbana icin yaratilmis gibi gorunuyor.",
+    "Bu bekledigim isbirligi. Santa ve Dolce and Gabbana.",
+    "Santa nin Dolce and Gabbana si sadece nefes kesici.",
+    "Dolce and Gabbana Santa uzerinde daha da iyi gorunuyor.",
+    "Santa ve Dolce and Gabbana moda dunyasinda mukemmel bir eslesme.",
+    "Lutfen daha fazla Santa nin Dolce and Gabbana si."
+  ]
+};
+
+// Expand by adding variations (short, medium, long) and modifiers for more unique comments
+const modifiers = [
+  "",
+  " Truly inspiring.",
+  " Cannot wait for more.",
+  " Absolute favorite.",
+  " So elegant.",
+  " Beyond perfect.",
+  " Iconic.",
+  " Timeless beauty.",
+  " Fashion excellence.",
+  " Simply the best."
+];
+
+function generateComment() {
+  const lang = languages[Math.floor(Math.random() * languages.length)];
+  const baseList = templates[lang];
+  if (!baseList || baseList.length === 0) return null;
+
+  let attempts = 0;
+  const maxAttempts = 50;
+  while (attempts < maxAttempts) {
+    const base = baseList[Math.floor(Math.random() * baseList.length)];
+    const mod = modifiers[Math.floor(Math.random() * modifiers.length)];
+    let comment = base;
+    if (mod && Math.random() > 0.4) {
+      comment += mod;
+    }
+    // Occasionally make shorter or add slight variation
+    if (Math.random() < 0.3) {
+      comment = base.split('.')[0] + '.';
+    }
+    if (!usedComments.has(comment)) {
+      return comment;
+    }
+    attempts++;
+  }
+  // Fallback: append a unique number if somehow exhausted (unlikely)
+  const fallback = baseList[0] + " " + Date.now();
+  if (!usedComments.has(fallback)) return fallback;
+  return null;
+}
+
+async function generateAndCopy() {
+  const comment = generateComment();
+  if (!comment) {
+    previewEl.textContent = "No more unique comments available at this time.";
+    return;
+  }
+  usedComments.add(comment);
+  count++;
+  safeSetItem(STORAGE_KEY, JSON.stringify([...usedComments]));
+  safeSetItem(COUNT_KEY, count.toString());
+  updateCounter();
+  previewEl.textContent = comment;
+
+  try {
+    await navigator.clipboard.writeText(comment);
+  } catch (err) {
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea');
+    textArea.value = comment;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+  }
+}
+
+btn.addEventListener('click', generateAndCopy);
+
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && !e.repeat) {
+    e.preventDefault();
+    generateAndCopy();
+  }
+});
+</script>
+</body>
+</html>
